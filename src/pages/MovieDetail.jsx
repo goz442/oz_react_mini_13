@@ -1,16 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import movieListData from "../data/movieListData.json";
 
 const baseUrl = "https://image.tmdb.org/t/p/w500";
 
 export default function MovieDetail() {
   const { id } = useParams();
+  const [movie, setMovie] = useState(null);
+  const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
 
-  const movies = movieListData.results || movieListData;
-  const movie = movies.find((m) => m.id === Number(id));
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/${id}?language=ko-KR`,
+          {
+            headers: {
+              accept: "application/json",
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+          }
+        );
+        const data = await response.json();
+        setMovie(data);
+        console.log("상세 영화 데이터:", data);
+      } catch (error) {
+        console.error("영화 상세 데이터 가져오는 중 오류:", error);
+      }
+    };
+    fetchMovie();
+  }, [id]);
 
-  if (!movie) return <p className="text-white p-4">영화를 찾을 수 없습니다.</p>;
+  if (!movie)
+    return <p className="text-white p-4">영화 정보를 불러오는 중...</p>;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -40,3 +61,4 @@ export default function MovieDetail() {
     </div>
   );
 }
+
