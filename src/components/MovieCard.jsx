@@ -5,7 +5,10 @@ const baseUrl = "https://image.tmdb.org/t/p/w500";
 
 export default function MovieCard({ movie }) {
   return (
-    <Link to={`/details/${movie.id}`}>
+    <Link
+      to={`/details/${movie.id}`}
+      state={{ movie }} // 검색 데이터 전달
+    >
       <div className="relative overflow-hidden rounded-lg shadow-lg group cursor-pointer">
         <img
           className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-110"

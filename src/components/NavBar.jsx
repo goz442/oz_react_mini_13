@@ -1,39 +1,46 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function NavBar({ onSearch, onReset }) {
-  const [term, setTerm] = useState("");
+  const [input, setInput] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSearch) onSearch(term);
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") onSearch(input);
+  };
+
+  const handleClick = () => onSearch(input);
+
+  const handleLogoClick = () => {
+    setInput("");
+    onReset();        // 검색 초기화
+    navigate("/");    // ✅ 홈("/")으로 이동
   };
 
   return (
-    <nav className="bg-gray-900 p-4 text-white flex flex-col sm:flex-row items-center justify-between">
-      <Link
-        to="/"
-        className="text-xl font-bold mb-2 sm:mb-0"
-        onClick={onReset}
+    <nav className="bg-gray-900 p-4 flex items-center justify-between">
+      <div
+        className="text-xl font-bold cursor-pointer"
+        onClick={handleLogoClick}
       >
         OP 무비
-      </Link>
-
-      <form onSubmit={handleSubmit} className="flex w-full sm:w-auto">
+      </div>
+      <div className="flex gap-2">
         <input
           type="text"
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder="영화 검색..."
-          className="p-2 rounded text-black w-full sm:w-64"
+          className="rounded px-2 py-1 text-black"
         />
         <button
-          type="submit"
-          className="ml-2 px-4 py-2 bg-yellow-500 text-black rounded"
+          onClick={handleClick}
+          className="bg-yellow-500 px-3 py-1 rounded font-bold"
         >
           검색
         </button>
-      </form>
+      </div>
     </nav>
   );
 }
