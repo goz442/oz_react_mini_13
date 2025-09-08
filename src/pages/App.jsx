@@ -3,6 +3,7 @@ import MovieCard from "../components/MovieCard";
 import { useOutletContext } from "react-router-dom";
 import useDebounce from "../hooks/useDebounce";
 
+
 export default function App() {
   const { searchQuery } = useOutletContext(); // Layout에서 전달된 검색어
   const [movies, setMovies] = useState([]);
@@ -13,6 +14,7 @@ export default function App() {
       try {
         let allMovies = [];
         let page = 1;
+
         const maxMovies = 20;
 
         while (allMovies.length < maxMovies) {
@@ -36,6 +38,7 @@ export default function App() {
         }
 
         setMovies(allMovies.slice(0, maxMovies));
+
       } catch (error) {
         console.error("영화 데이터를 불러오는 중 오류 발생:", error);
       }

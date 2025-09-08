@@ -7,6 +7,7 @@ export default function MovieDetail() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
+
   const navigate = useNavigate();
   const location = useLocation(); // 검색에서 넘어온 상태 데이터 확인
 
@@ -83,3 +84,4 @@ export default function MovieDetail() {
     </div>
   );
 }
+
