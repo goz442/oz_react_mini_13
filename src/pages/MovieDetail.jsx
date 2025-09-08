@@ -5,24 +5,24 @@ const baseUrl = "https://image.tmdb.org/t/p/w500";
 
 export default function MovieDetail() {
   const { id } = useParams();
-  const [movie, setMovie] = useState(null); // ✅ 상태 관리
-  const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN; // ✅ .env Access Token 사용
+  const [movie, setMovie] = useState(null);
+  const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
 
   useEffect(() => {
     const fetchMovie = async () => {
       try {
         const response = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?language=ko-KR`, // ✅ language 옵션
+          `https://api.themoviedb.org/3/movie/${id}?language=ko-KR`,
           {
             headers: {
               accept: "application/json",
-              Authorization: `Bearer ${ACCESS_TOKEN}`, // ✅ Bearer 인증
+              Authorization: `Bearer ${ACCESS_TOKEN}`,
             },
           }
         );
         const data = await response.json();
-        setMovie(data); // ✅ 상태에 저장
-        console.log("상세 영화 데이터:", data); // ✅ 디버깅용
+        setMovie(data);
+        console.log("상세 영화 데이터:", data);
       } catch (error) {
         console.error("영화 상세 데이터 가져오는 중 오류:", error);
       }
@@ -31,7 +31,7 @@ export default function MovieDetail() {
   }, [id]);
 
   if (!movie)
-    return <p className="text-white p-4">영화 정보를 불러오는 중...</p>; // ✅ 로딩 상태
+    return <p className="text-white p-4">영화 정보를 불러오는 중...</p>;
 
   return (
     <div className="max-w-4xl mx-auto p-6">

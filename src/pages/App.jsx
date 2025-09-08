@@ -1,58 +1,60 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import MovieCard from "../components/MovieCard";
+import { useOutletContext } from "react-router-dom";
 
 export default function App() {
+  const { searchQuery } = useOutletContext();
   const [movies, setMovies] = useState([]);
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        let allMovies = [];
-        let page = 1;
-        const maxMovies = 20; // 화면에 표시할 최대 영화 수
+  const fetchMovies = async (term = "") => {
+    try {
+      let allMovies = [];
+      let page = 1;
+      const maxMovies = 20;
 
-        while (allMovies.length < maxMovies) {
-          const response = await fetch(
-            `https://api.themoviedb.org/3/movie/popular?language=ko-KR&page=${page}`,
-            {
-              headers: {
-                accept: "application/json",
-                Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
-              },
-            }
-          );
+      while (allMovies.length < maxMovies) {
+        const url = term
+          ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
+              term
+            )}&language=ko-KR&page=${page}`
+          : `https://api.themoviedb.org/3/movie/popular?language=ko-KR&page=${page}`;
 
-          const data = await response.json();
-          const filtered = (data.results || []).filter(movie => {
-            if (movie.adult) return false;
-            const forbiddenWords = ["엄마", "아빠", "18+", "Adult"]; // 필터링 단어
-            for (let word of forbiddenWords) {
-              if (movie.title.includes(word)) return false;
-            }
-            return true;
-          });
+        const response = await fetch(url, {
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
+          },
+        });
 
-          allMovies = allMovies.concat(filtered);
-          page++;
-          if (page > 5) break; // 안전 장치: 최대 5페이지
-        }
+        const data = await response.json();
+        const filtered = (data.results || []).filter((movie) => {
+          if (movie.adult) return false;
+          const forbiddenWords = ["엄마", "아빠", "18+", "Adult"];
+          return !forbiddenWords.some((word) => movie.title.includes(word));
+        });
 
-        setMovies(allMovies.slice(0, maxMovies)); // 최대 영화 수 맞춤
-        console.log("영화 데이터:", allMovies.slice(0, maxMovies)); // 디버깅용
-      } catch (error) {
-        console.error("영화 데이터를 불러오는 중 오류 발생:", error);
+        allMovies = allMovies.concat(filtered);
+        page++;
+        if (page > 5) break;
       }
-    };
 
-    fetchMovies();
-  }, []);
+      setMovies(allMovies.slice(0, maxMovies));
+    } catch (error) {
+      console.error("영화 데이터를 불러오는 중 오류 발생:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMovies(searchQuery);
+  }, [searchQuery]);
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-white mb-6">상영중 영화</h1>
+      <h1 className="text-3xl font-bold mb-6 text-white">상영중 영화</h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {Array.isArray(movies) &&
-          movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
+        {movies.map((movie) => (
+          <MovieCard key={movie.id} movie={movie} />
+        ))}
       </div>
     </div>
   );
